@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res/css/networkdemo.css</file>
+        <file>res/css/qwe.txt</file>
+        <file>res/image/app.ico</file>
+    </qresource>
+</RCC>
