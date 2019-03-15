@@ -1,4 +1,4 @@
-﻿#include "NetworkDemo.h"
+﻿#include "MainWindow.h"
 #include <QApplication>
 
 #include "Utils.h"
@@ -9,12 +9,11 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     a.setStyleSheet(Utils::instance()->getAppCss());
 
-    NetworkDemo w;
-  //  SystemTrayIcon icon;
-  //  w.setTrayIcon(&icon);
+    MainWindow w;
+    SystemTrayIcon icon;
+    w.setTrayIcon(&icon);
 
     w.show();
 
-    int ret = a.exec();
-    return ret;
+    return a.exec();
 }

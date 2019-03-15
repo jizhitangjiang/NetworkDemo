@@ -1,7 +1,9 @@
 <RCC>
     <qresource prefix="/">
         <file>res/css/networkdemo.css</file>
-        <file>res/css/qwe.txt</file>
         <file>res/image/app.ico</file>
+        <file>res/image/background.png</file>
+        <file>res/image/button_close.png</file>
+        <file>res/image/button_min.png</file>
     </qresource>
 </RCC>

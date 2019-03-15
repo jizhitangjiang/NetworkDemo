@@ -5,6 +5,10 @@
 #include <QSystemTrayIcon>
 #include <QAction>
 
+/**
+ * @brief The SystemTrayIcon class
+ * @note 设置系统托盘
+ */
 class SystemTrayIcon : public QObject
 {
     Q_OBJECT
