@@ -6,6 +6,7 @@
 #include "WindowStyle.h"
 #include "SystemTrayIcon.h"
 #include "HostInfo.h"
+#include "DownloadItemForm.h"
 
 namespace Ui {
 class MainWindow;

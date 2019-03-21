@@ -34,6 +34,7 @@ void MainWindow::setTrayIcon(SystemTrayIcon *tray)
 void MainWindow::init()
 {
     setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
+
     m_windowStyle = new WindowStyle(this);
     m_windowStyle->activateOn(this);
 
@@ -42,6 +43,9 @@ void MainWindow::init()
     ui->plainTextEdit->appendPlainText("主机IP地址列表:\n" + m_hostInfo->hostAddress());
 
     connect(m_hostInfo, &HostInfo::lookupHostFinish, this, &MainWindow::onLookupHostFinished);
+
+    DownloadItemForm *item= new DownloadItemForm(this);
+    ui->widgetContent->layout()->addWidget(item);
 }
 
 void MainWindow::onTrayEventActivate(SystemTrayIcon::TrayEventType type)

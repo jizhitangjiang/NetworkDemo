@@ -21,17 +21,22 @@ SOURCES += main.cpp\
     src/utils/SystemTrayIcon.cpp \
     src/utils/WindowStyle.cpp \
     src/ui/MainWindow.cpp \
-    src/utils/HostInfo.cpp
+    src/utils/HostInfo.cpp \
+    src/utils/NetWork.cpp \
+    src/ui/DownloadItemForm.cpp
 
 HEADERS  += \
     src/utils/Utils.h \
     src/utils/SystemTrayIcon.h \
     src/utils/WindowStyle.h \
     src/ui/MainWindow.h \
-    src/utils/HostInfo.h
+    src/utils/HostInfo.h \
+    src/utils/NetWork.h \
+    src/ui/DownloadItemForm.h
 
 FORMS    += \
-    src/ui/MainWindow.ui
+    src/ui/MainWindow.ui \
+    src/ui/DownloadItemForm.ui
 
 RESOURCES += \
     qrc.qrc
