@@ -6,12 +6,13 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QQueue>
+#include "FileHandler.h"
 
 struct ReqData
 {
     QUrl    m_url = "";
     int     m_rid = 0;
-    QString m_filePath = "";
+    FileHandler *m_fileHandler = NULL;
     QNetworkReply *m_reply = NULL;
 };
 
@@ -24,7 +25,17 @@ public:
     ~NetWork();
 
 public:
+    /**
+     * @brief 下载文件
+     * @param url 文件url
+     * @param filePath 文件保存路径
+     * @return 返回下载id
+     */
     int downloadFile(const QString &url, const QString &filePath);
+    /**
+     * @brief stop 停止下载
+     * @param rid 下载的id
+     */
     void stop(int rid);
 
 private:

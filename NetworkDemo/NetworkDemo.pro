@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     src/ui/MainWindow.cpp \
     src/utils/HostInfo.cpp \
     src/utils/NetWork.cpp \
-    src/ui/DownloadItemForm.cpp
+    src/ui/DownloadItemForm.cpp \
+    src/utils/FileHandler.cpp
 
 HEADERS  += \
     src/utils/Utils.h \
@@ -32,7 +33,8 @@ HEADERS  += \
     src/ui/MainWindow.h \
     src/utils/HostInfo.h \
     src/utils/NetWork.h \
-    src/ui/DownloadItemForm.h
+    src/ui/DownloadItemForm.h \
+    src/utils/FileHandler.h
 
 FORMS    += \
     src/ui/MainWindow.ui \

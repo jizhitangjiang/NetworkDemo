@@ -3,7 +3,6 @@
 #include <QTimer>
 #include <QMutexLocker>
 #include <QNetworkRequest>
-#include <QFile>
 
 static const int s_requestSize = 10;
 
@@ -22,7 +21,7 @@ NetWork::~NetWork()
 
 int NetWork::downloadFile(const QString &url, const QString &filePath)
 {
-    if (url.isEmpty()) {
+    if (url.isEmpty() || filePath.isEmpty()) {
         return -1;
     }
 
@@ -35,14 +34,17 @@ void NetWork::stop(int rid)
         return;
     }
 
-    ReqData *reqData = m_running.value(rid);
+    ReqData *reqData = m_running.value(rid, NULL);
     if (reqData == NULL) {
         return;
     }
 
-    QNetworkReply *reply = reqData->m_reply;
-    if (reply) {
-       reply->abort();
+    if (reqData->m_reply != NULL) {
+       reqData->m_reply->abort();
+    }
+
+    if (reqData->m_fileHandler != NULL) {
+        reqData->m_fileHandler->closeFile();
     }
 
     deleteRequest(rid);
@@ -55,7 +57,7 @@ int NetWork::enqueue(const QString &url, const QString &filePath)
     ReqData *req = new ReqData;
     req->m_rid = ++m_reqId;
     req->m_url = QUrl(url);
-    req->m_filePath = filePath;
+    req->m_fileHandler = new FileHandler(filePath, this);
 
     m_ready.enqueue(req);
     QTimer::singleShot(0, this, &NetWork::onDelyRequest);
@@ -79,11 +81,11 @@ void NetWork::deleteRequest(int rid)
         return;
     }
 
-    ReqData *reqData = m_running.value(rid);
-    if (reqData) {
+    ReqData *reqData = m_running.value(rid, NULL);
+    if (reqData != NULL) {
         QNetworkReply *reply = reqData->m_reply;
 
-        if (reply) {
+        if (reply != NULL) {
             disconnect(reply, &QNetworkReply::finished, this,
                 &NetWork::onHttpReplyFinished);
             disconnect(reply, &QNetworkReply::downloadProgress, this,
@@ -97,8 +99,10 @@ void NetWork::deleteRequest(int rid)
             reply = NULL;
         }
 
-        delete reqData;
-        reqData = NULL;
+        if (reqData->m_fileHandler != NULL) {
+            delete reqData->m_fileHandler;
+            reqData->m_fileHandler = NULL;
+        }
     }
 
     m_running.remove(rid);
@@ -116,15 +120,21 @@ void NetWork::onDelyRequest()
         return;
     }
 
+    qint64 size = 0;
+    if (!reqData->m_fileHandler->openFile(size)) {
+        emit requestError(reqData->m_rid, "文件打开失败");
+        deleteRequest(reqData->m_rid);
+        return;
+    }
+
     QNetworkRequest req(reqData->m_url);
-    QFile file(reqData->m_filePath);
-    if(file.size() > 0) {
-        QByteArray recvByte = QString("bytes=%1-").arg(file.size()).toUtf8();
+    if(size > 0) {
+        QByteArray recvByte = QString("bytes=%1-").arg(size).toUtf8();
         req.setRawHeader("Range", recvByte);
     }
 
     QNetworkReply *reply = m_manager.get(req);
-    if (reply) {
+    if (reply != NULL) {
         reqData->m_reply = reply;
         reply->setProperty("rid", reqData->m_rid);
 
@@ -152,8 +162,12 @@ void NetWork::onHttpReplyFinished()
     }
 
     int rid = reply->property("rid").toInt();
-    if (reply->error() == QNetworkReply::NoError && rid > 0) {
-        emit requestFinished(rid);
+    ReqData *reqData = m_running.value(rid, NULL);
+    if (reqData != NULL) {
+        reqData->m_fileHandler->closeFile();
+        if (reply->error() == QNetworkReply::NoError && rid > 0) {
+            emit requestFinished(rid);
+        }
     }
 
     deleteRequest(rid);
@@ -178,17 +192,12 @@ void NetWork::onReadReady()
     if (reply == NULL) {
         return;
     }
-
     int rid = reply->property("rid").toInt();
-    if (rid > 0) {
-        ReqData *reqData = m_running.value(rid);
-        QFile file(reqData->m_filePath);
-        if (file.open(QIODevice::WriteOnly | QIODevice::Append)){
-            file.write(reply->readAll());
-            file.close();
-        } else {
+    ReqData *reqData = m_running.value(rid, NULL);
+    if (reqData != NULL) {
+        if (!reqData->m_fileHandler->writeFile(reply->readAll())) {
             stop(rid);
-            emit requestError(rid, "文件打开失败");
+            emit requestError(rid, "文件写入失败");
         }
     }
 }
@@ -203,8 +212,7 @@ void NetWork::onError(QNetworkReply::NetworkError code)
 
     int rid = reply->property("rid").toInt();
     if (rid > 0) {
-        QString error = reply->error();
-        int code = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+        QString error = reply->errorString();
         emit requestError(rid, error);
     }
 
