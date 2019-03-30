@@ -20,12 +20,14 @@ private:
     void init();
 
 private slots:
-    void on_btnStart_clicked();
     void onDownloadProgress(int rid, qint64 bytesReceived, qint64 bytesTotal);
+    void onDownloadFinished(int rid);
+    void on_btnStop_clicked(bool checked);
 
 private:
     Ui::DownloadItemForm *ui;
     NetWork *m_network;
+    int      m_rid;
 };
 
 #endif // DOWNLOADITEMFORM_H

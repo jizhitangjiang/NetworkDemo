@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QUrl>
+#include <QMutex>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QQueue>
@@ -10,7 +11,7 @@
 
 struct ReqData
 {
-    QUrl    m_url = "";
+    QUrl    m_url;
     int     m_rid = 0;
     FileHandler *m_fileHandler = NULL;
     QNetworkReply *m_reply = NULL;
@@ -45,7 +46,7 @@ private:
 
 signals:
     void downloadProgress(int rid, qint64 bytesReceived, qint64 bytesTotal);
-    void readReady(int rid, const QByteArray &data);
+   // void readReady(int rid, const QByteArray &data);
     void requestError(int rid, const QString &error);
     void requestFinished(int rid);
 

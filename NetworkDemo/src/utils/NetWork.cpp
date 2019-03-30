@@ -39,8 +39,17 @@ void NetWork::stop(int rid)
         return;
     }
 
-    if (reqData->m_reply != NULL) {
-       reqData->m_reply->abort();
+    QNetworkReply *reply = reqData->m_reply;
+    if (reply!= NULL) {
+        disconnect(reply, &QNetworkReply::finished, this,
+            &NetWork::onHttpReplyFinished);
+        disconnect(reply, &QNetworkReply::downloadProgress, this,
+            &NetWork::onDownloadProgress);
+        disconnect(reply, &QNetworkReply::readyRead, this,
+            &NetWork::onReadReady);
+        disconnect(reply, static_cast<void(QNetworkReply::*)(QNetworkReply::NetworkError)>(&QNetworkReply::error),
+                this, &NetWork::onError);
+       reply->abort();
     }
 
     if (reqData->m_fileHandler != NULL) {
@@ -83,24 +92,13 @@ void NetWork::deleteRequest(int rid)
 
     ReqData *reqData = m_running.value(rid, NULL);
     if (reqData != NULL) {
-        QNetworkReply *reply = reqData->m_reply;
-
-        if (reply != NULL) {
-            disconnect(reply, &QNetworkReply::finished, this,
-                &NetWork::onHttpReplyFinished);
-            disconnect(reply, &QNetworkReply::downloadProgress, this,
-                &NetWork::onDownloadProgress);
-            disconnect(reply, &QNetworkReply::readyRead, this,
-                &NetWork::onReadReady);
-            disconnect(reply, static_cast<void(QNetworkReply::*)(QNetworkReply::NetworkError)>(&QNetworkReply::error),
-                    this, &NetWork::onError);
-
-            reply->deleteLater();
-            reply = NULL;
+        if (reqData->m_reply != NULL) {
+            reqData->m_reply->deleteLater();
+            reqData->m_reply = NULL;
         }
 
         if (reqData->m_fileHandler != NULL) {
-            delete reqData->m_fileHandler;
+            reqData->m_fileHandler->deleteLater();
             reqData->m_fileHandler = NULL;
         }
     }
@@ -164,7 +162,7 @@ void NetWork::onHttpReplyFinished()
     int rid = reply->property("rid").toInt();
     ReqData *reqData = m_running.value(rid, NULL);
     if (reqData != NULL) {
-        reqData->m_fileHandler->closeFile();
+        reqData->m_fileHandler->finishFile();
         if (reply->error() == QNetworkReply::NoError && rid > 0) {
             emit requestFinished(rid);
         }
@@ -179,10 +177,11 @@ void NetWork::onDownloadProgress(qint64 bytesReceived, qint64 bytesTotal)
     if (reply == NULL) {
         return;
     }
-
+    QString range = reply->rawHeader("Content-Range");
+    qint64 size = range.left(range.indexOf("-")).toLongLong();
     int rid = reply->property("rid").toInt();
     if (rid > 0) {
-        emit downloadProgress(rid, bytesReceived, bytesTotal);
+        emit downloadProgress(rid, bytesReceived + size, bytesTotal + size);
     }
 }
 

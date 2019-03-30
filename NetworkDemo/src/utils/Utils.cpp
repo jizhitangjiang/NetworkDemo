@@ -7,8 +7,10 @@
 Utils* Utils::m_instance = NULL;
 Utils::AutoDelete Utils::AutoDelete::m_instance;
 
-Utils::Utils()
+Utils::Utils(QObject *parent)
+    : QObject(parent)
 {
+    m_network = new NetWork(this);
 }
 
 Utils::~Utils()
@@ -43,6 +45,11 @@ QByteArray Utils::getAppCss()
     }
 
     return css;
+}
+
+NetWork *Utils::network()
+{
+    return m_network;
 }
 
 

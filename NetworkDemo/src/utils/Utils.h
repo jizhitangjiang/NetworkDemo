@@ -2,9 +2,12 @@
 #define UTILS_H
 
 #include <QString>
+#include "NetWork.h"
 
-class Utils
+class Utils : public QObject
 {
+    Q_OBJECT
+
 private:
     class AutoDelete
     {
@@ -20,7 +23,7 @@ private:
     };
 
 private:
-    Utils();
+    explicit Utils(QObject *parent = 0);
     ~Utils();
 
 public:
@@ -34,9 +37,15 @@ public:
      * @return 返回应用的CSS样式
      */
     QByteArray getAppCss();
+    /**
+     * @brief 获得网路模块
+     * @return 返回网络模块对象
+     */
+    NetWork *network();
 
 private:
     static Utils *m_instance;
+    NetWork *m_network;
 };
 
 #endif // UTILS_H

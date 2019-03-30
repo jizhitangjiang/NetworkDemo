@@ -51,6 +51,11 @@ void FileHandler::closeFile()
     if (m_file.isOpen()) {
         m_file.close();
     }
+}
+
+void FileHandler::finishFile()
+{
+    closeFile();
 
     if (QFile::exists(m_filePath)) {
         if (!QFile::remove(m_filePath)) {
