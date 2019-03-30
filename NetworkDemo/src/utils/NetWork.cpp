@@ -3,6 +3,7 @@
 #include <QTimer>
 #include <QMutexLocker>
 #include <QNetworkRequest>
+#include <QRegExp>
 
 static const int s_requestSize = 10;
 
@@ -162,9 +163,10 @@ void NetWork::onHttpReplyFinished()
     int rid = reply->property("rid").toInt();
     ReqData *reqData = m_running.value(rid, NULL);
     if (reqData != NULL) {
-        reqData->m_fileHandler->finishFile();
+        reqData->m_fileHandler->closeFile();
+        reqData->m_fileHandler->renameFile();
         if (reply->error() == QNetworkReply::NoError && rid > 0) {
-            emit requestFinished(rid);
+            emit requestFinished(rid, reqData->m_fileHandler->fileSize());
         }
     }
 
@@ -177,8 +179,15 @@ void NetWork::onDownloadProgress(qint64 bytesReceived, qint64 bytesTotal)
     if (reply == NULL) {
         return;
     }
+
+    //从http响应头中获得已经下载的文件大小
+    QRegExp exp("bytes\\s(\\d*)");
     QString range = reply->rawHeader("Content-Range");
-    qint64 size = range.left(range.indexOf("-")).toLongLong();
+    qint64 size = 0;
+    if (exp.indexIn(range) != -1) {
+       size = exp.cap(1).toLongLong();
+    }
+
     int rid = reply->property("rid").toInt();
     if (rid > 0) {
         emit downloadProgress(rid, bytesReceived + size, bytesTotal + size);

@@ -53,15 +53,22 @@ void FileHandler::closeFile()
     }
 }
 
-void FileHandler::finishFile()
+void FileHandler::renameFile(QString filePath)
 {
-    closeFile();
+    if (filePath.isEmpty()) {
+        filePath = m_filePath;
+    }
 
-    if (QFile::exists(m_filePath)) {
-        if (!QFile::remove(m_filePath)) {
+    if (QFile::exists(filePath)) {
+        if (!QFile::remove(filePath)) {
             return;
         }
     }
 
-    m_file.rename(m_filePath);
+    m_file.rename(filePath);
+}
+
+qint64 FileHandler::fileSize()
+{
+    return m_file.size();
 }

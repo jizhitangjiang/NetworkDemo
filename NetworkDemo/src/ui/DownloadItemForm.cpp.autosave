@@ -70,7 +70,7 @@ QString DownloadItemForm::remainTime(qint64 remainBytes, qint64 speed)
     qint64 seconds = remainBytes / speed;
     QTime time(0, 0, 0);
     time = time.addSecs(seconds);
-    qDebug()<<"seconds"<<seconds;
+
     return time.toString("hh:mm:ss");
 }
 

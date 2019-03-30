@@ -15,7 +15,8 @@ public:
     bool openFile(qint64 &size);
     bool writeFile(const QByteArray &data);
     void closeFile();
-    void finishFile();
+    void renameFile(QString filePath = "");
+    qint64 fileSize();
 
 private:
     QFile   m_file;

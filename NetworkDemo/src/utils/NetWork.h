@@ -48,7 +48,7 @@ signals:
     void downloadProgress(int rid, qint64 bytesReceived, qint64 bytesTotal);
    // void readReady(int rid, const QByteArray &data);
     void requestError(int rid, const QString &error);
-    void requestFinished(int rid);
+    void requestFinished(int rid, qint64 fileSize);
 
 private slots:
     void onDelyRequest();
