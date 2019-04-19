@@ -41,6 +41,7 @@ private:
     Ui::MainWindow *ui;
     WindowStyle *m_windowStyle;
     HostInfo    *m_hostInfo;
+    SystemTrayIcon *m_tray;
 };
 
 #endif // MAINWINDOW_H

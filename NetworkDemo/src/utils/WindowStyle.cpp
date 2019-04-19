@@ -6,8 +6,7 @@
 WindowStyle::WindowStyle(QObject *parent)
     : QObject(parent)
     , m_widget(NULL)
-{
-
+{ 
 }
 
 WindowStyle::~WindowStyle()

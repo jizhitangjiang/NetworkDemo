@@ -1,0 +1,34 @@
+DownloadItemForm > #progressBar {
+	background:rgba(198,198,198);
+	color:rgb(255,0,0);
+	border-radius:2px;
+}
+
+DownloadItemForm > #progressBar:chunk {	
+	background:blue;
+	border-radius:2px;
+}
+
+DownloadItemForm > #widget > #labelName,
+DownloadItemForm > #widgetInfo > #labelInfo,
+DownloadItemForm > #widgetInfo > #labelSize,
+DownloadItemForm > #widgetInfo > #labelSpeed,
+DownloadItemForm > #widgetInfo > #labelTime
+{
+	font:14px "微软雅黑";
+}
+ 
+DownloadItemForm > #widget > #btnStart, 
+DownloadItemForm > #widget > #btnStop
+{	
+	font:14px "微软雅黑";
+	border-radius:0px;
+}
+
+DownloadItemForm > #widget > #btnStart:hover, 
+DownloadItemForm > #widget > #btnStop:hover
+{	
+	font:14px "微软雅黑";
+	color:rgba(0,0,255,1);
+	border-radius:0px;
+}

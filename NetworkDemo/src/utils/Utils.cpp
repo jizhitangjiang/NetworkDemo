@@ -2,6 +2,7 @@
 
 #include <QDir>
 #include <QSystemTrayIcon>
+#include <QWidget>
 #include <QDebug>
 
 Utils* Utils::m_instance = NULL;
@@ -9,8 +10,9 @@ Utils::AutoDelete Utils::AutoDelete::m_instance;
 
 Utils::Utils(QObject *parent)
     : QObject(parent)
+    , m_network(NULL)
 {
-    m_network = new NetWork(this);
+
 }
 
 Utils::~Utils()
@@ -22,6 +24,7 @@ Utils* Utils::instance()
     if (m_instance == NULL) {
         m_instance = new Utils;
     }
+
     return m_instance;
 }
 
@@ -49,6 +52,10 @@ QByteArray Utils::getAppCss()
 
 NetWork *Utils::network()
 {
+    if (m_network == NULL) {
+        m_network = new NetWork(this);
+    }
+
     return m_network;
 }
 

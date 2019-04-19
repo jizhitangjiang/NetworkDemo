@@ -1,6 +1,7 @@
 ﻿#include "SystemTrayIcon.h"
 
 #include <QMenu>
+#include <qDebug>
 #include <QApplication>
 
 SystemTrayIcon::SystemTrayIcon(QObject *parent)

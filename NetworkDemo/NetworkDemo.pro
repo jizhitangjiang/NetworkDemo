@@ -11,7 +11,7 @@ RC_ICONS = res/image/app.ico
 #RC_FILE = networkdemo.rc
 win32::QMAKE_CXXFLAGS += -FIcharsetsetting.inc
 DESTDIR = ../bin
-TARGET = NetworkDemo
+TARGET = DLT
 
 INCLUDEPATH += src/ui\
                src/utils
@@ -24,7 +24,10 @@ SOURCES += main.cpp\
     src/utils/HostInfo.cpp \
     src/utils/NetWork.cpp \
     src/ui/DownloadItemForm.cpp \
-    src/utils/FileHandler.cpp
+    src/utils/FileHandler.cpp \
+    src/ui/DownLoadListForm.cpp \
+    src/ui/CreateDownloadDialog.cpp \
+    src/ui/MaskForm.cpp
 
 HEADERS  += \
     src/utils/Utils.h \
@@ -34,11 +37,16 @@ HEADERS  += \
     src/utils/HostInfo.h \
     src/utils/NetWork.h \
     src/ui/DownloadItemForm.h \
-    src/utils/FileHandler.h
+    src/utils/FileHandler.h \
+    src/ui/DownLoadListForm.h \
+    src/ui/CreateDownloadDialog.h \
+    src/ui/MaskForm.h
 
 FORMS    += \
     src/ui/MainWindow.ui \
-    src/ui/DownloadItemForm.ui
+    src/ui/DownloadItemForm.ui \
+    src/ui/DownLoadListForm.ui \
+    src/ui/CreateDownloadDialog.ui
 
 RESOURCES += \
     qrc.qrc

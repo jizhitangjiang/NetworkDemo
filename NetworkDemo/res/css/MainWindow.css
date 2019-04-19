@@ -1,0 +1,42 @@
+MainWindow > #mainWidget
+{
+	border-top:6px solid qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(219, 219, 219, 0.8), stop:1 rgba(255, 255, 255, 0));
+	border-bottom:6px solid qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(219, 219, 219, 0.8), stop:1 rgba(255, 255, 255, 0));
+	border-left:6px solid qlineargradient(spread:pad, x1:1, y1:0, x2:0, y2:0, stop:0 rgba(219, 219, 219, 0.8), stop:1 rgba(255, 255, 255, 0));
+	border-right:6px solid qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(219, 219, 219, 0.8), stop:1 rgba(255, 255, 255, 0));
+}
+
+MainWindow > #mainWidget > #widget
+{
+	background:rgb(254,254,254);
+}
+
+MainWindow > #mainWidget > #widget > #widgetTitle > #btnClose 
+{
+	border:0px;
+	border-image:url(://res/image/button_close.png);
+}
+
+MainWindow > #mainWidget > #widget > #widgetTitle > #btnMin 
+{
+	border:0px;
+	border-image:url(://res/image/button_min.png);
+}
+
+
+MainWindow > #mainWidget > #widget > #widgetContent > #widgetDetail > #widgetOperate > #btnDomainIp
+{
+	border:0px;
+	font:14px "微软雅黑";
+	color:rgba(0,0,0,1);
+}
+
+MainWindow > #mainWidget > #widget > #widgetContent > #widgetDetail > #widgetOperate > #btnDomainIp:hover
+{
+	color:rgba(0,0,255,1);
+}
+
+MainWindow > #mainWidget > #widget > #widgetContent > #widgetDetail > #plainTextEdit
+{
+	font:14px "微软雅黑";
+}

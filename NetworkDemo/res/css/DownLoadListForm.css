@@ -1,0 +1,17 @@
+DownLoadListForm
+{
+	border:1px solid rgba(0,0,0,1);
+}
+
+DownLoadListForm > #widgetOperate > #btnCreate
+{
+	font:14px "微软雅黑";
+	border:0px;
+}
+
+DownLoadListForm > #widgetOperate > #btnCreate:hover
+{
+	font:14px "微软雅黑";
+	color:rgb(0,0,255);
+	border:0px;
+}

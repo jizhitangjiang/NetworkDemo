@@ -2,17 +2,20 @@
 #include "ui_DownloadItemForm.h"
 
 #include <QFile>
+#include <QTimer>
 #include "Utils.h"
 
 #define SIZE_KB 1024
 #define SIZE_MB 1024 * 1024
 #define SIZE_GB 1024 * 1024 *1024
 
-DownloadItemForm::DownloadItemForm(QWidget *parent)
+DownloadItemForm::DownloadItemForm(QString url, QString filePath, QWidget *parent)
     : QWidget(parent)
     , m_network(NULL)
     , m_rid(-1)
     , m_recevieBytes(0)
+    , m_url(url)
+    , m_filePath(filePath)
     , ui(new Ui::DownloadItemForm)
 {
     ui->setupUi(this);
@@ -25,8 +28,29 @@ DownloadItemForm::~DownloadItemForm()
     delete ui;
 }
 
+void DownloadItemForm::download()
+{
+    if (m_url.isEmpty() || m_filePath.isEmpty()) {
+        return;
+    }
+
+    ui->btnStart->setText("暂停");
+    m_rid = m_network->downloadFile(m_url, m_filePath);
+    m_time.start();
+//    QTimer *timer = new QTimer(this);
+//    timer->setInterval(500);
+//    timer->start();
+//    connect(timer, &QTimer::timeout, this, [=]{
+//        ui->progressBar->setValue(ui->progressBar->value()+1);
+//        qDebug()<<ui->progressBar->value();
+//        });
+}
+
 void DownloadItemForm::init()
 {
+    QUrl url(m_url);
+    ui->labelName->setText(url.fileName());
+
     m_network = Utils::instance()->network();
     connect(m_network, &NetWork::downloadProgress, this, &DownloadItemForm::onDownloadProgress);
     connect(m_network, &NetWork::requestFinished, this, &DownloadItemForm::onDownloadFinished);
@@ -67,10 +91,14 @@ qint64 DownloadItemForm::downloadSpeed(qint64 receiveBytes)
 
 QString DownloadItemForm::remainTime(qint64 remainBytes, qint64 speed)
 {
+    if (speed <= 0) {
+        return "";
+    }
+
     qint64 seconds = remainBytes / speed;
     QTime time(0, 0, 0);
     time = time.addSecs(seconds);
-    qDebug()<<"seconds"<<seconds;
+
     return time.toString("hh:mm:ss");
 }
 
@@ -104,17 +132,22 @@ void DownloadItemForm::onDownloadFinished(int rid, qint64 fileSize)
     ui->labelTime->hide();
     ui->btnStart->hide();
     ui->btnStop->hide();
-    ui->progressBar->hide();
 }
 
-void DownloadItemForm::on_btnStop_clicked(bool checked)
+
+void DownloadItemForm::on_btnStart_clicked(bool checked)
 {
     if (checked) {
-        m_rid = m_network->downloadFile("http://mv.xesimg.com/martrix/web/message/1551861572464/%E5%BA%8F%E5%88%9701_1~1.mp4","D://assist.mp4");
-        m_time.start();
+        download();
     } else {
+        ui->btnStart->setText("开始");
         m_network->stop(m_rid);
         m_rid = -1;
         m_recevieBytes = 0;
     }
+}
+
+void DownloadItemForm::on_btnStop_clicked()
+{
+
 }

@@ -42,6 +42,7 @@ public:
      * @return 返回网络模块对象
      */
     NetWork *network();
+    void setShadow(QWidget *widget);
 
 private:
     static Utils *m_instance;

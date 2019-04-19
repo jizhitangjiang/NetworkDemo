@@ -13,8 +13,10 @@ class DownloadItemForm : public QWidget
     Q_OBJECT
 
 public:
-    explicit DownloadItemForm(QWidget *parent = 0);
+    explicit DownloadItemForm(QString url, QString filePath, QWidget *parent = 0);
     ~DownloadItemForm();
+
+    void download();
 
 private:
     void init();
@@ -22,10 +24,15 @@ private:
     qint64 downloadSpeed(qint64 receiveBytes);
     QString remainTime(qint64 remainBytes, qint64 speed);
 
+signals:
+    void loadFinished();
+
 private slots:
     void onDownloadProgress(int rid, qint64 bytesReceived, qint64 bytesTotal);
     void onDownloadFinished(int rid, qint64 fileSize);
-    void on_btnStop_clicked(bool checked);
+    void on_btnStart_clicked(bool checked);
+
+    void on_btnStop_clicked();
 
 private:
     Ui::DownloadItemForm *ui;
@@ -33,6 +40,8 @@ private:
     int      m_rid;
     QTime    m_time;
     qint64   m_recevieBytes;
+    QString  m_url;
+    QString  m_filePath;
 };
 
 #endif // DOWNLOADITEMFORM_H

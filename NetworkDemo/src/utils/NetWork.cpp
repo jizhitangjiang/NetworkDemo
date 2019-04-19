@@ -15,8 +15,9 @@ NetWork::NetWork(QObject *parent)
 
 NetWork::~NetWork()
 {
-    for (const auto &item : m_running) {
-        deleteRequest(item->m_rid);
+    QList<int> keys = m_running.keys();
+    for (auto &key : keys) {
+        deleteRequest(key);
     }
 }
 
@@ -41,7 +42,7 @@ void NetWork::stop(int rid)
     }
 
     QNetworkReply *reply = reqData->m_reply;
-    if (reply!= NULL) {
+    if (reply != NULL) {
         disconnect(reply, &QNetworkReply::finished, this,
             &NetWork::onHttpReplyFinished);
         disconnect(reply, &QNetworkReply::downloadProgress, this,
