@@ -24,6 +24,10 @@ void MaskForm::installWidget(QWidget *widget)
 
     widget->installEventFilter(this);
     m_widget = widget;
+
+    connect(m_widget, &QWidget::destroyed, this, [=](){
+        m_widget = nullptr;
+        });
 }
 
 void MaskForm::setMaskColor(const QColor &color, float opacity)

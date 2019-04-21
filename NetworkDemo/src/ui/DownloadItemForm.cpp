@@ -5,13 +5,9 @@
 #include <QTimer>
 #include "Utils.h"
 
-#define SIZE_KB 1024
-#define SIZE_MB 1024 * 1024
-#define SIZE_GB 1024 * 1024 *1024
-
 DownloadItemForm::DownloadItemForm(QString url, QString filePath, QWidget *parent)
     : QWidget(parent)
-    , m_network(NULL)
+    , m_network(nullptr)
     , m_rid(-1)
     , m_recevieBytes(0)
     , m_url(url)
@@ -37,13 +33,6 @@ void DownloadItemForm::download()
     ui->btnStart->setText("暂停");
     m_rid = m_network->downloadFile(m_url, m_filePath);
     m_time.start();
-//    QTimer *timer = new QTimer(this);
-//    timer->setInterval(500);
-//    timer->start();
-//    connect(timer, &QTimer::timeout, this, [=]{
-//        ui->progressBar->setValue(ui->progressBar->value()+1);
-//        qDebug()<<ui->progressBar->value();
-//        });
 }
 
 void DownloadItemForm::init()
@@ -56,25 +45,6 @@ void DownloadItemForm::init()
     connect(m_network, &NetWork::requestFinished, this, &DownloadItemForm::onDownloadFinished);
 }
 
-QString DownloadItemForm::trasformUnit(qint64 bytes)
-{
-    QString unit = "B";
-    if (bytes < SIZE_KB) {
-
-    } else if (bytes < SIZE_MB) {
-        bytes /= SIZE_KB;
-        unit = "KB";
-    } else if (bytes < SIZE_GB) {
-        bytes /= SIZE_MB;
-        unit = "MB";
-    } else {
-        bytes /= SIZE_GB;
-        unit = "GB";
-    }
-
-    return  QString("%1%2").arg(bytes).arg(unit);
-}
-
 qint64 DownloadItemForm::downloadSpeed(qint64 receiveBytes)
 {
     if (receiveBytes < m_recevieBytes) {
@@ -82,10 +52,11 @@ qint64 DownloadItemForm::downloadSpeed(qint64 receiveBytes)
     }
 
     qint64 inervalBytes = receiveBytes - m_recevieBytes;
-    m_recevieBytes = receiveBytes;
-    qint64 speed = inervalBytes * 1000 / m_time.elapsed();
+    int elapsedTime = m_time.elapsed();
+    qint64 speed = inervalBytes * 1000 / elapsedTime;
     m_time.restart();
 
+    m_recevieBytes = receiveBytes;
     return speed;
 }
 
@@ -112,12 +83,13 @@ void DownloadItemForm::onDownloadProgress(int rid, qint64 bytesReceived, qint64 
     ui->progressBar->setValue(bytesReceived);
 
     qint64 speed = downloadSpeed(bytesReceived);
-    ui->labelSpeed->setText(QString("%1/s").arg(trasformUnit(speed)));
+    ui->labelSpeed->setText(QString("%1/s").arg(Utils::instance()->trasformUnit(speed)));
     ui->labelTime->setText(remainTime(bytesTotal - bytesReceived, speed));
     ui->labelSize->setText(QString("%1/%2")
-        .arg(trasformUnit(bytesReceived))
-        .arg(trasformUnit(bytesTotal)));
+        .arg(Utils::instance()->trasformUnit(bytesReceived))
+        .arg(Utils::instance()->trasformUnit(bytesTotal)));
 
+    update();
 }
 
 void DownloadItemForm::onDownloadFinished(int rid, qint64 fileSize)
@@ -126,7 +98,7 @@ void DownloadItemForm::onDownloadFinished(int rid, qint64 fileSize)
         return;
     }
 
-    ui->labelSize->setText(trasformUnit(fileSize));
+    ui->labelSize->setText(Utils::instance()->trasformUnit(fileSize));
     ui->labelInfo->setText("文件下载完成");
     ui->labelSpeed->hide();
     ui->labelTime->hide();

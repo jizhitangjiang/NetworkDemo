@@ -13,8 +13,8 @@ struct ReqData
 {
     QUrl    m_url;
     int     m_rid = 0;
-    FileHandler *m_fileHandler = NULL;
-    QNetworkReply *m_reply = NULL;
+    FileHandler *m_fileHandler = nullptr;
+    QNetworkReply *m_reply = nullptr;
 };
 
 class NetWork : public QObject
@@ -22,7 +22,7 @@ class NetWork : public QObject
     Q_OBJECT
 
 public:
-    explicit NetWork(QObject *parent = 0);
+    explicit NetWork(QObject *parent = nullptr);
     ~NetWork();
 
 public:

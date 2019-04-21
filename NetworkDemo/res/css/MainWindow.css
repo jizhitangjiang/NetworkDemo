@@ -14,13 +14,13 @@ MainWindow > #mainWidget > #widget
 MainWindow > #mainWidget > #widget > #widgetTitle > #btnClose 
 {
 	border:0px;
-	border-image:url(://res/image/button_close.png);
+	border-image:url(://image/button_close.png);
 }
 
 MainWindow > #mainWidget > #widget > #widgetTitle > #btnMin 
 {
 	border:0px;
-	border-image:url(://res/image/button_min.png);
+	border-image:url(://image/button_min.png);
 }
 
 
