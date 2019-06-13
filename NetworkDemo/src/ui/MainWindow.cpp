@@ -40,7 +40,7 @@ void MainWindow::init()
     setAttribute(Qt::WA_TranslucentBackground);
 
     m_windowStyle = new WindowStyle(this);
-    m_windowStyle->activateOn(this);
+    m_windowStyle->activateOn(ui->widgetTitle);
 
     m_hostInfo = new HostInfo(this);
     ui->plainTextEdit->appendPlainText("本地主机名：" + m_hostInfo->hostName());

@@ -23,12 +23,15 @@ public:
 private:
     bool eventFilter(QObject *watched, QEvent *event);
     void mousePressHandle(QWidget *watched, QMouseEvent *event);
+    void mouseReleaseHandle(QWidget *watched, QMouseEvent *event);
     void mouseMoveHandle(QWidget *watched, QMouseEvent *event);
     void mouseDBClicked(QWidget *watched, QMouseEvent *event);
 
 private:
     QPoint m_distance;
     QWidget *m_widget;
+    QWidget *m_wnd;
+    bool    m_leftPressed;
 };
 
 #endif // WINDOWSTYLE_H
