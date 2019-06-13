@@ -31,6 +31,10 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../../res/qrc.qrc">
+    <normaloff>:/image/app.ico</normaloff>:/image/app.ico</iconset>
+  </property>
   <property name="styleSheet">
    <string notr="true">/*#MainWindow &gt; #mainWidget
 {
@@ -44,7 +48,7 @@
 {
 	border-image:url(://res/image/background.png);
 	
-}*/
+}*//*
 #MainWindow &gt; #mainWidget &gt; #widget
 {
 	background:rgb(254,254,254);
@@ -315,6 +319,8 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../../res/qrc.qrc"/>
+ </resources>
  <connections/>
 </ui>

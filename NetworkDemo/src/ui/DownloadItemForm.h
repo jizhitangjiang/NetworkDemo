@@ -20,7 +20,6 @@ public:
 
 private:
     void init();
-    QString trasformUnit(qint64 bytes);
     qint64 downloadSpeed(qint64 receiveBytes);
     QString remainTime(qint64 remainBytes, qint64 speed);
 

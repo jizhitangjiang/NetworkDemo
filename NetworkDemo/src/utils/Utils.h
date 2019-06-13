@@ -42,7 +42,7 @@ public:
      * @return 返回网络模块对象
      */
     NetWork *network();
-    void setShadow(QWidget *widget);
+    QString trasformUnit(qint64 bytes);
 
 private:
     static Utils *m_instance;

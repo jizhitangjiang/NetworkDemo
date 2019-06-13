@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/">
+        <file>image/app.ico</file>
+        <file>image/background.png</file>
+        <file>image/button_close.png</file>
+        <file>image/button_min.png</file>
+        <file>css/DownLoadListForm.css</file>
+        <file>css/MainWindow.css</file>
+        <file>css/DownloadItemForm.css</file>
+    </qresource>
+</RCC>

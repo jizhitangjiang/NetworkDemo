@@ -65,6 +65,8 @@ void FileHandler::renameFile(QString filePath)
         }
     }
 
+    closeFile();
+
     m_file.rename(filePath);
 }
 

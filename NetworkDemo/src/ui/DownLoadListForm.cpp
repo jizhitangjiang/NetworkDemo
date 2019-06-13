@@ -28,7 +28,7 @@ void DownLoadListForm::createDownItemForm(const QString &url, const QString &fil
     QStandardItemModel *model = dynamic_cast<QStandardItemModel *>
         (ui->tableView->model());
 
-    if (model == NULL) {
+    if (model == nullptr) {
         return;
     }
 
@@ -57,6 +57,12 @@ void DownLoadListForm::on_btnCreate_clicked()
     CreateDownloadDialog dlg(maskForm);
     maskForm->installWidget(&dlg);
 
-    maskForm->show();
-    dlg.exec();
+    int ret = dlg.exec();
+
+    if (ret == QDialog::Accepted) {
+        QString url;
+        QString filePath;
+        dlg.getDownloadInfo(url, filePath);
+        createDownItemForm(url, filePath);
+    }
 }

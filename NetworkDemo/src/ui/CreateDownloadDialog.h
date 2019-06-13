@@ -2,6 +2,8 @@
 #define CREATEDOWNLOADDIALOG_H
 
 #include <QDialog>
+#include <QTimer>
+#include <QNetworkAccessManager>
 
 namespace Ui {
 class CreateDownloadDialog;
@@ -15,15 +17,28 @@ public:
     explicit CreateDownloadDialog(QWidget *parent = 0);
     ~CreateDownloadDialog();
 
+    void getDownloadInfo(QString &url, QString &path);
+
 private:
     void init();
-    void showEvent(QShowEvent *event);
+    qint64 getDiskFreeSize(QString path);
+    void setDirectoryInfo(const QString &dir);
 
 private slots:
     void on_btnClose_clicked();
+    void on_textEdit_textChanged();
+    void onTimeOut();
+    void onHttpReplyFinished();
+    void on_btnPath_clicked();
+
+    void on_btnDownload_clicked();
 
 private:
     Ui::CreateDownloadDialog *ui;
+    QTimer                m_timer;
+    QUrl                  m_url;
+    QNetworkAccessManager m_manager;
+    QString               m_path;
 };
 
 #endif // CREATEDOWNLOADDIALOG_H

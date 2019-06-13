@@ -5,7 +5,7 @@
 #include <QNetworkRequest>
 #include <QRegExp>
 
-static const int s_requestSize = 10;
+static const int s_requestSize = 20;
 
 NetWork::NetWork(QObject *parent)
     : QObject(parent)
@@ -36,13 +36,13 @@ void NetWork::stop(int rid)
         return;
     }
 
-    ReqData *reqData = m_running.value(rid, NULL);
-    if (reqData == NULL) {
+    ReqData *reqData = m_running.value(rid, nullptr);
+    if (reqData == nullptr) {
         return;
     }
 
     QNetworkReply *reply = reqData->m_reply;
-    if (reply != NULL) {
+    if (reply != nullptr) {
         disconnect(reply, &QNetworkReply::finished, this,
             &NetWork::onHttpReplyFinished);
         disconnect(reply, &QNetworkReply::downloadProgress, this,
@@ -54,7 +54,7 @@ void NetWork::stop(int rid)
        reply->abort();
     }
 
-    if (reqData->m_fileHandler != NULL) {
+    if (reqData->m_fileHandler != nullptr) {
         reqData->m_fileHandler->closeFile();
     }
 
@@ -80,7 +80,7 @@ ReqData* NetWork::dequeue()
 {
     QMutexLocker locker(&m_mutex);
     if (m_ready.isEmpty()) {
-        return NULL;
+        return nullptr;
     }
 
     return m_ready.dequeue();
@@ -92,16 +92,16 @@ void NetWork::deleteRequest(int rid)
         return;
     }
 
-    ReqData *reqData = m_running.value(rid, NULL);
-    if (reqData != NULL) {
-        if (reqData->m_reply != NULL) {
+    ReqData *reqData = m_running.value(rid, nullptr);
+    if (reqData != nullptr) {
+        if (reqData->m_reply != nullptr) {
             reqData->m_reply->deleteLater();
-            reqData->m_reply = NULL;
+            reqData->m_reply = nullptr;
         }
 
-        if (reqData->m_fileHandler != NULL) {
+        if (reqData->m_fileHandler != nullptr) {
             reqData->m_fileHandler->deleteLater();
-            reqData->m_fileHandler = NULL;
+            reqData->m_fileHandler = nullptr;
         }
     }
 
@@ -116,7 +116,7 @@ void NetWork::onDelyRequest()
     }
 
     ReqData* reqData = dequeue();
-    if (reqData == NULL) {
+    if (reqData == nullptr) {
         return;
     }
 
@@ -134,7 +134,7 @@ void NetWork::onDelyRequest()
     }
 
     QNetworkReply *reply = m_manager.get(req);
-    if (reply != NULL) {
+    if (reply != nullptr) {
         reqData->m_reply = reply;
         reply->setProperty("rid", reqData->m_rid);
 
@@ -157,14 +157,13 @@ void NetWork::onDelyRequest()
 void NetWork::onHttpReplyFinished()
 {
     QNetworkReply *reply = dynamic_cast<QNetworkReply *>(sender());
-    if (reply == NULL) {
+    if (reply == nullptr) {
         return;
     }
 
     int rid = reply->property("rid").toInt();
-    ReqData *reqData = m_running.value(rid, NULL);
-    if (reqData != NULL) {
-        reqData->m_fileHandler->closeFile();
+    ReqData *reqData = m_running.value(rid, nullptr);
+    if (reqData != nullptr) {
         reqData->m_fileHandler->renameFile();
         if (reply->error() == QNetworkReply::NoError && rid > 0) {
             emit requestFinished(rid, reqData->m_fileHandler->fileSize());
@@ -177,7 +176,7 @@ void NetWork::onHttpReplyFinished()
 void NetWork::onDownloadProgress(qint64 bytesReceived, qint64 bytesTotal)
 {
     QNetworkReply *reply = dynamic_cast<QNetworkReply *>(sender());
-    if (reply == NULL) {
+    if (reply == nullptr) {
         return;
     }
 
@@ -198,12 +197,12 @@ void NetWork::onDownloadProgress(qint64 bytesReceived, qint64 bytesTotal)
 void NetWork::onReadReady()
 {
     QNetworkReply *reply = dynamic_cast<QNetworkReply *>(sender());
-    if (reply == NULL) {
+    if (reply == nullptr) {
         return;
     }
     int rid = reply->property("rid").toInt();
-    ReqData *reqData = m_running.value(rid, NULL);
-    if (reqData != NULL) {
+    ReqData *reqData = m_running.value(rid, nullptr);
+    if (reqData != nullptr) {
         if (!reqData->m_fileHandler->writeFile(reply->readAll())) {
             stop(rid);
             emit requestError(rid, "文件写入失败");
@@ -215,7 +214,7 @@ void NetWork::onError(QNetworkReply::NetworkError code)
 {
     Q_UNUSED(code);
     QNetworkReply *reply = dynamic_cast<QNetworkReply *>(sender());
-    if (reply == NULL) {
+    if (reply == nullptr) {
         return;
     }
 

@@ -14,7 +14,7 @@ DESTDIR = ../bin
 TARGET = DLT
 
 INCLUDEPATH += src/ui\
-               src/utils
+               src/utils\
 
 SOURCES += main.cpp\
     src/utils/Utils.cpp \
@@ -49,4 +49,4 @@ FORMS    += \
     src/ui/CreateDownloadDialog.ui
 
 RESOURCES += \
-    qrc.qrc
+    res/qrc.qrc
