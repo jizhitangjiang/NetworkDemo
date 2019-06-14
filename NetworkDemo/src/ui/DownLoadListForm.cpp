@@ -53,13 +53,11 @@ void DownLoadListForm::init()
 
 void DownLoadListForm::on_btnCreate_clicked()
 {
-    MaskForm *maskForm = new MaskForm;
-    CreateDownloadDialog dlg(maskForm);
-    maskForm->installWidget(&dlg);
+    MaskForm maskForm;
+    CreateDownloadDialog dlg(&maskForm);
+    maskForm.installWidget(&dlg);
 
-    int ret = dlg.exec();
-
-    if (ret == QDialog::Accepted) {
+    if (dlg.exec() == QDialog::Accepted) {
         QString url;
         QString filePath;
         dlg.getDownloadInfo(url, filePath);

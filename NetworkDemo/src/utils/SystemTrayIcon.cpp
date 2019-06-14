@@ -17,8 +17,9 @@ SystemTrayIcon::~SystemTrayIcon()
 
 void SystemTrayIcon::init()
 {
-    m_trayIcon.setIcon(QIcon(":/res/image/app.ico"));
+    m_trayIcon.setIcon(QIcon(":/image/app.ico"));
     m_trayIcon.setToolTip("下载工具");
+    connect(&m_trayIcon, &QSystemTrayIcon::activated, this, &SystemTrayIcon::onActivated);
 
     QMenu *menu = new QMenu((QWidget*)QApplication::desktop());
     QAction *openAction = new QAction("打开下载工具", this);
@@ -44,5 +45,20 @@ void SystemTrayIcon::onActionClicked(QAction *action)
         return;
     }
     TrayEventType type = (TrayEventType)value;
+    emit trayEventActivate(type);
+}
+
+void SystemTrayIcon::onActivated(QSystemTrayIcon::ActivationReason reason)
+{
+    TrayEventType type = TrayEventType_Null;
+
+    switch (reason) {
+    case QSystemTrayIcon::ActivationReason::DoubleClick:
+        type = TrayEventType_DClick;
+        break;
+    default:
+        break;
+    }
+
     emit trayEventActivate(type);
 }

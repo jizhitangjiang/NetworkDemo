@@ -46,16 +46,12 @@ void MainWindow::init()
     ui->plainTextEdit->appendPlainText("本地主机名：" + m_hostInfo->hostName());
     ui->plainTextEdit->appendPlainText("主机IP地址列表:\n" + m_hostInfo->hostAddress());
     connect(m_hostInfo, &HostInfo::lookupHostFinish, this, &MainWindow::onLookupHostFinished);
-
-//    for (int i = 0; i < 10 ;i++) {
-//        ui->widgetList->createDownItemForm("http://mv.xesimg.com/martrix/web/message/1551861572464/%E5%BA%8F%E5%88%9701_1~1.mp4",
-//                                           QString("D://assist%1.mp4").arg(i));
-//    }
 }
 
 void MainWindow::onTrayEventActivate(SystemTrayIcon::TrayEventType type)
 {
     switch(type) {
+    case SystemTrayIcon::TrayEventType_DClick:
     case SystemTrayIcon::TrayEventType_Open:
         window()->activateWindow();
         showNormal();

@@ -15,9 +15,11 @@ class SystemTrayIcon : public QObject
 
 public:
     enum TrayEventType {
+        TrayEventType_Null,
         TrayEventType_Open,
         TrayEventType_Minimun,
-        TrayEventType_Close
+        TrayEventType_Close,
+        TrayEventType_DClick
     };
 
 public:
@@ -32,6 +34,7 @@ signals:
 
 private slots:
     void onActionClicked(QAction *action);
+    void onActivated(QSystemTrayIcon::ActivationReason reason);
 
 private:
     QSystemTrayIcon m_trayIcon;

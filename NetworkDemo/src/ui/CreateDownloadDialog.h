@@ -1,6 +1,7 @@
 ﻿#ifndef CREATEDOWNLOADDIALOG_H
 #define CREATEDOWNLOADDIALOG_H
 
+#include <QUrl>
 #include <QDialog>
 #include <QTimer>
 #include <QNetworkAccessManager>
