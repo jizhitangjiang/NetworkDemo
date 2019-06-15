@@ -3,11 +3,11 @@
 #include <QWidget>
 #include <QDebug>
 
-#define BORDER 30
+#define BORDER 10
 
 CursorStyle::CursorStyle(QObject *parent)
     : QObject(parent)
-    , m_type(ShapeType_Oright)
+    , m_type(ShapeType_Origin)
 {
 
 }
@@ -30,9 +30,8 @@ void CursorStyle::updateCursorPos(const QPoint &point, const QRect &rect)
 
     bool isLeftEdge = cursorX >= widgetX && cursorX <= widgetX + BORDER;
     bool isRightEdge = cursorX <= widgetX + widgetW && cursorX >= widgetX + widgetW - BORDER;
-    bool isTopEdge = cursorY >= widgetY && widgetY <= widgetY + BORDER;
+    bool isTopEdge = cursorY >= widgetY && cursorY <= widgetY + BORDER;
     bool isBottomEdge = cursorY <= widgetY + widgetH && cursorY >= widgetY + widgetH - BORDER;
-
     bool isTopLeftEdge = isTopEdge && isLeftEdge;
     bool isBottomLeftEdge = isBottomEdge && isLeftEdge;
     bool isTopRightEdge = isTopEdge && isRightEdge;
@@ -55,13 +54,13 @@ void CursorStyle::updateCursorPos(const QPoint &point, const QRect &rect)
     } else if (isBottomEdge) {
         m_type = ShapeType_Bottom;
     } else {
-        m_type = ShapeType_Oright;
+        m_type = ShapeType_Origin;
     }
 }
 
-void CursorStyle::updateCursorStyle(const QPoint &gPoint, const QRect &rect, QWidget *widget)
+void CursorStyle::updateCursorStyle(const QPoint &point, QWidget *widget)
 {
-    updateCursorPos(gPoint, rect);
+    updateCursorPos(point, widget->geometry());
 
     if (m_type == ShapeType_Topleft || m_type == ShapeType_Bottomright) {
         widget->setCursor(Qt::SizeFDiagCursor);
@@ -78,8 +77,10 @@ void CursorStyle::updateCursorStyle(const QPoint &gPoint, const QRect &rect, QWi
 
 WindowStyle::WindowStyle(QObject *parent)
     : QObject(parent)
-    , m_widget(NULL)
-    , m_leftPressed(false)
+    , m_widget(nullptr)
+    , m_wnd(nullptr)
+    , m_isLeftPressed(false)
+    , m_isCursorOnWidget(false)
 { 
 }
 
@@ -93,12 +94,12 @@ void WindowStyle::activateOn(QWidget *widget)
     m_widget = widget;
     m_wnd = widget->window();
 
-    m_widget->installEventFilter(this);
+    m_wnd->installEventFilter(this);
 }
 
 bool WindowStyle::eventFilter(QObject *watched, QEvent *event)
 {
-    if (watched == m_widget) {
+    if (watched == m_wnd) {
         QEvent::Type type = event->type();
 
         switch(type) {
@@ -109,13 +110,13 @@ bool WindowStyle::eventFilter(QObject *watched, QEvent *event)
             mouseReleaseHandle(m_widget, dynamic_cast<QMouseEvent*>(event));
             break;
         case QEvent::MouseMove:
-            mouseMoveHandle(m_widget, dynamic_cast<QMouseEvent*>(event));
+            mouseMoveHandle(m_wnd, dynamic_cast<QMouseEvent*>(event));
             break;
         case QEvent::MouseButtonDblClick:
             mouseDBClickedHandle(m_widget, dynamic_cast<QMouseEvent*>(event));
             break;
         case QEvent::HoverMove:
-            mouseHoverHandle(m_widget, dynamic_cast<QMouseEvent*>(event));
+            mouseHoverHandle(m_wnd, dynamic_cast<QHoverEvent*>(event));
             break;
         default:
             break;
@@ -130,8 +131,12 @@ void WindowStyle::mousePressHandle(QWidget *watched, QMouseEvent *event)
     Q_UNUSED(watched);
 
     if (event->button() == Qt::LeftButton) {
-        m_leftPressed = true;
-        m_distance = event->globalPos() - m_wnd->mapToGlobal(QPoint(0,0));
+        m_isLeftPressed = true;
+
+        if (m_widget->geometry().contains(event->pos())) {
+            m_isCursorOnWidget = true;
+            m_distance = event->globalPos() - m_widget->mapToGlobal(QPoint(0,0));
+        }
     }
 }
 
@@ -140,7 +145,8 @@ void WindowStyle::mouseReleaseHandle(QWidget *watched, QMouseEvent *event)
     Q_UNUSED(watched);
 
     if (event->button() == Qt::LeftButton) {
-        m_leftPressed = false;
+        m_isLeftPressed = false;
+        m_isCursorOnWidget = false;
     }
 }
 
@@ -148,8 +154,15 @@ void WindowStyle::mouseMoveHandle(QWidget *watched, QMouseEvent *event)
 {
     Q_UNUSED(watched);
 
-    if (m_leftPressed) {
-        m_wnd->move(event->globalPos() - m_distance);
+    if (m_isLeftPressed) {
+        if (m_cursorStyle.CursorType() != CursorStyle::ShapeType_Origin) {
+            resizeWidget(event->globalPos());
+            return;
+        }
+
+        if (m_isCursorOnWidget) {
+            m_wnd->move(event->globalPos() - m_distance);
+        }
     }
 }
 
@@ -157,7 +170,9 @@ void WindowStyle::mouseDBClickedHandle(QWidget *watched, QMouseEvent *event)
 {
     Q_UNUSED(watched);
 
-    if (event->button() == Qt::LeftButton) {
+    if (event->button() == Qt::LeftButton &&
+        m_widget->geometry().contains(event->pos()))
+    {
         if (m_wnd->isMaximized()) {
             m_wnd->showNormal();
         } else {
@@ -166,7 +181,84 @@ void WindowStyle::mouseDBClickedHandle(QWidget *watched, QMouseEvent *event)
     }
 }
 
-void WindowStyle::mouseHoverHandle(QWidget *watched, QMouseEvent *event)
+void WindowStyle::mouseHoverHandle(QWidget *watched, QHoverEvent *event)
 {
-    m_cursorStyle.updateCursorStyle(event->globalPos(), m_wnd->geometry(), m_wnd);
+    Q_UNUSED(watched);
+
+    if (!m_isLeftPressed) {
+        m_cursorStyle.updateCursorStyle(m_wnd->mapToGlobal(event->pos()), m_wnd);
+    }
+}
+
+void WindowStyle::resizeWidget(const QPoint &point)
+{
+    QRect originRect = m_wnd->geometry();
+
+    //原始窗口四个点得坐标
+    int left = originRect.left();
+    int right = originRect.right();
+    int top = originRect.top();
+    int bottom = originRect.bottom();
+
+    //窗口最小宽度和高度
+    int minWidth = m_wnd->minimumWidth();
+    int minHeight = m_wnd->minimumHeight();
+
+    //根据鼠标得位置更新四个点得坐标
+    switch (m_cursorStyle.CursorType()) {
+    case CursorStyle::ShapeType_Topleft:
+        top = point.y();
+        left = point.x();
+        break;
+    case CursorStyle::ShapeType_Bottomleft:
+        bottom = point.y();
+        left = point.x();
+        break;
+    case CursorStyle::ShapeType_Topright:
+        top = point.y();
+        right = point.x();
+        break;
+    case CursorStyle::ShapeType_Bottomright:
+        bottom = point.y();
+        right = point.x();
+        break;
+    case CursorStyle::ShapeType_Left:
+        left = point.x();
+        break;
+    case CursorStyle::ShapeType_Right:
+        right = point.x();
+        break;
+    case CursorStyle::ShapeType_Top:
+        top = point.y();
+        break;
+    case CursorStyle::ShapeType_Bottom:
+        bottom = point.y();
+        break;
+    default:
+        break;
+    }
+
+    //窗口得拉伸后得区域
+    QRect newRect(QPoint(left, top), QPoint(right, bottom));
+
+    //防止窗口到达最小宽度和高度之后，开始平移
+    if ( newRect.isValid() )
+    {
+      if ( minWidth > newRect.width() )
+      {
+        if( left != originRect.left() )
+          newRect.setLeft( originRect.left() );
+        else
+          newRect.setRight( originRect.right() );
+      }
+      if ( minHeight > newRect.height() )
+      {
+        if ( top != originRect.top() )
+          newRect.setTop( originRect.top() );
+        else
+          newRect.setBottom( originRect.bottom() );
+      }
+    }
+
+    m_wnd->setGeometry(newRect);
 }

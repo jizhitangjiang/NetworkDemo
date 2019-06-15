@@ -9,7 +9,7 @@ class CursorStyle : public QObject
 public:
     enum ShapeType
     {
-        ShapeType_Oright,
+        ShapeType_Origin,
         ShapeType_Left,
         ShapeType_Right,
         ShapeType_Top,
@@ -24,18 +24,33 @@ public:
     explicit CursorStyle(QObject *parent = 0);
     ~CursorStyle();
 
-    void updateCursorStyle(const QPoint &point, const QRect &rect, QWidget *widget);
+    /**
+     * @brief 更新鼠标显示样式
+     * @param 鼠标得全局坐标
+     * @param 窗口
+     */
+    void updateCursorStyle(const QPoint &point, QWidget *widget);
+    /**
+     * @brief 获得鼠标当前样式
+     * @return 返回鼠标样式
+     */
+    ShapeType CursorType(){return m_type;}
 
 private:
+    /**
+     * @brief 计算鼠标的位置，更新m_type
+     * @param 鼠标得全局坐标
+     * @param 窗口的区域
+     */
     void updateCursorPos(const QPoint &point, const QRect &rect);
 
 private:
-    ShapeType m_type;
+    ShapeType m_type;   //鼠标当前的样式
 };
 
 /**
  * @brief The WindowStyle class
- * @note 将窗口注册在此，进行拖拽移动，双击放大缩小
+ * @note 将窗口注册在此，进行拖拽移动，双击放大缩小，拉伸等功能
  */
 class WindowStyle : public QObject
 {
@@ -55,13 +70,21 @@ private:
     void mouseReleaseHandle(QWidget *watched, QMouseEvent *event);
     void mouseMoveHandle(QWidget *watched, QMouseEvent *event);
     void mouseDBClickedHandle(QWidget *watched, QMouseEvent *event);
-    void mouseHoverHandle(QWidget *watched, QMouseEvent *event);
+    void mouseHoverHandle(QWidget *watched, QHoverEvent *event);
+
+    /**
+     * @brief 拉伸窗口
+     * @param 鼠标的全局坐标
+     */
+    void resizeWidget(const QPoint &point);
 
 private:
-    QPoint   m_distance;    //记录点击位置与m_wnd左上角距离
-    QWidget *m_widget;      //鼠标可以操作的窗口
-    QWidget *m_wnd;         //进行缩放，移动的窗口
-    bool     m_leftPressed; //鼠标左键是否按下
+    QPoint   m_distance;            //记录点击位置与m_wnd左上角距离
+    QWidget *m_widget;              //鼠标可以操作的窗口，一般是标题栏
+    QWidget *m_wnd;                 //进行拉伸，移动的窗口，一般为整个窗口
+
+    bool     m_isLeftPressed;       //鼠标左键是否按下
+    bool     m_isCursorOnWidget;    //鼠标按下时是否在m_widget上
     CursorStyle m_cursorStyle;
 };
 
