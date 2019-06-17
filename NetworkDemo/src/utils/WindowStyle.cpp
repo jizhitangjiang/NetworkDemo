@@ -137,9 +137,11 @@ void WindowStyle::mousePressHandle(QMouseEvent *event)
     if (event->button() == Qt::LeftButton) {
         m_isLeftPressed = true;
 
-        if (m_widget->geometry().contains(event->pos())) {
+        //若m_wnd等于m_widget使用全局坐标，否则使用相对坐标
+        QPoint pos = m_widget == m_wnd ? event->globalPos() : event->pos();
+        if (m_widget->geometry().contains(pos)) {
             m_isCursorOnWidget = true;
-            m_distance = event->globalPos() - m_widget->mapToGlobal(QPoint(0,0));
+            m_distance = event->globalPos() - m_wnd->mapToGlobal(QPoint(0,0));
         }
     }
 }
@@ -160,7 +162,7 @@ void WindowStyle::mouseMoveHandle(QMouseEvent *event)
             return;
         }
 
-        if (m_isResizable &&  m_isCursorOnWidget) {
+        if (m_isMovable &&  m_isCursorOnWidget) {
             m_wnd->move(event->globalPos() - m_distance);
         }
     }
@@ -181,7 +183,7 @@ void WindowStyle::mouseDBClickedHandle(QMouseEvent *event)
 
 void WindowStyle::mouseHoverHandle(QHoverEvent *event)
 {
-    if (m_isMovable && !m_isLeftPressed) {
+    if (m_isResizable && !m_isLeftPressed) {
         m_cursorStyle.updateCursorStyle(m_wnd->mapToGlobal(event->pos()), m_wnd);
     }
 }
@@ -237,7 +239,6 @@ void WindowStyle::resizeWidget(const QPoint &point)
     //窗口得拉伸后得区域
     QRect newRect(QPoint(left, top), QPoint(right, bottom));
 
-    qDebug()<<newRect;
     //防止窗口到达最小宽度和高度之后，开始平移
     if ( newRect.isValid() )
     {

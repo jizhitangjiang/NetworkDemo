@@ -3,7 +3,9 @@
 
 #include <QObject>
 #include <QMouseEvent>
-
+/**
+ * @brief 拉伸时候计算鼠标位置，更改鼠标样式
+ */
 class CursorStyle : public QObject
 {
 public:
@@ -47,6 +49,7 @@ private:
 private:
     ShapeType m_type;   //鼠标当前的样式
 };
+
 
 /**
  * @brief The WindowStyle class
