@@ -81,6 +81,8 @@ WindowStyle::WindowStyle(QObject *parent)
     , m_wnd(nullptr)
     , m_isLeftPressed(false)
     , m_isCursorOnWidget(false)
+    , m_isMovable(true)
+    , m_isResizable(true)
 { 
 }
 
@@ -91,6 +93,10 @@ WindowStyle::~WindowStyle()
 
 void WindowStyle::activateOn(QWidget *widget)
 {
+    if (widget == nullptr) {
+        return;
+    }
+
     m_widget = widget;
     m_wnd = widget->window();
 
@@ -104,19 +110,19 @@ bool WindowStyle::eventFilter(QObject *watched, QEvent *event)
 
         switch(type) {
         case QEvent::MouseButtonPress:
-            mousePressHandle(m_widget, dynamic_cast<QMouseEvent*>(event));
+            mousePressHandle(dynamic_cast<QMouseEvent*>(event));
             break;
         case QEvent::MouseButtonRelease:
-            mouseReleaseHandle(m_widget, dynamic_cast<QMouseEvent*>(event));
+            mouseReleaseHandle(dynamic_cast<QMouseEvent*>(event));
             break;
         case QEvent::MouseMove:
-            mouseMoveHandle(m_wnd, dynamic_cast<QMouseEvent*>(event));
+            mouseMoveHandle(dynamic_cast<QMouseEvent*>(event));
             break;
         case QEvent::MouseButtonDblClick:
-            mouseDBClickedHandle(m_widget, dynamic_cast<QMouseEvent*>(event));
+            mouseDBClickedHandle(dynamic_cast<QMouseEvent*>(event));
             break;
         case QEvent::HoverMove:
-            mouseHoverHandle(m_wnd, dynamic_cast<QHoverEvent*>(event));
+            mouseHoverHandle(dynamic_cast<QHoverEvent*>(event));
             break;
         default:
             break;
@@ -126,10 +132,8 @@ bool WindowStyle::eventFilter(QObject *watched, QEvent *event)
     return QObject::eventFilter(watched, event);
 }
 
-void WindowStyle::mousePressHandle(QWidget *watched, QMouseEvent *event)
+void WindowStyle::mousePressHandle(QMouseEvent *event)
 {
-    Q_UNUSED(watched);
-
     if (event->button() == Qt::LeftButton) {
         m_isLeftPressed = true;
 
@@ -140,36 +144,30 @@ void WindowStyle::mousePressHandle(QWidget *watched, QMouseEvent *event)
     }
 }
 
-void WindowStyle::mouseReleaseHandle(QWidget *watched, QMouseEvent *event)
+void WindowStyle::mouseReleaseHandle(QMouseEvent *event)
 {
-    Q_UNUSED(watched);
-
     if (event->button() == Qt::LeftButton) {
         m_isLeftPressed = false;
         m_isCursorOnWidget = false;
     }
 }
 
-void WindowStyle::mouseMoveHandle(QWidget *watched, QMouseEvent *event)
+void WindowStyle::mouseMoveHandle(QMouseEvent *event)
 {
-    Q_UNUSED(watched);
-
     if (m_isLeftPressed) {
         if (m_cursorStyle.CursorType() != CursorStyle::ShapeType_Origin) {
             resizeWidget(event->globalPos());
             return;
         }
 
-        if (m_isCursorOnWidget) {
+        if (m_isResizable &&  m_isCursorOnWidget) {
             m_wnd->move(event->globalPos() - m_distance);
         }
     }
 }
 
-void WindowStyle::mouseDBClickedHandle(QWidget *watched, QMouseEvent *event)
+void WindowStyle::mouseDBClickedHandle(QMouseEvent *event)
 {
-    Q_UNUSED(watched);
-
     if (event->button() == Qt::LeftButton &&
         m_widget->geometry().contains(event->pos()))
     {
@@ -181,11 +179,9 @@ void WindowStyle::mouseDBClickedHandle(QWidget *watched, QMouseEvent *event)
     }
 }
 
-void WindowStyle::mouseHoverHandle(QWidget *watched, QHoverEvent *event)
+void WindowStyle::mouseHoverHandle(QHoverEvent *event)
 {
-    Q_UNUSED(watched);
-
-    if (!m_isLeftPressed) {
+    if (m_isMovable && !m_isLeftPressed) {
         m_cursorStyle.updateCursorStyle(m_wnd->mapToGlobal(event->pos()), m_wnd);
     }
 }
@@ -241,6 +237,7 @@ void WindowStyle::resizeWidget(const QPoint &point)
     //窗口得拉伸后得区域
     QRect newRect(QPoint(left, top), QPoint(right, bottom));
 
+    qDebug()<<newRect;
     //防止窗口到达最小宽度和高度之后，开始平移
     if ( newRect.isValid() )
     {
@@ -258,7 +255,7 @@ void WindowStyle::resizeWidget(const QPoint &point)
         else
           newRect.setBottom( originRect.bottom() );
       }
-    }
 
-    m_wnd->setGeometry(newRect);
+      m_wnd->setGeometry(newRect);
+    }
 }

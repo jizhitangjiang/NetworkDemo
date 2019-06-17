@@ -4,6 +4,7 @@
 
 #include <QDebug>
 #include <QJsonObject>
+#include <QTranslator>
 #include <QGraphicsDropShadowEffect>
 
 #include "Utils.h"
@@ -36,6 +37,10 @@ void MainWindow::setTrayIcon(SystemTrayIcon *tray)
 
 void MainWindow::init()
 {
+    QTranslator *translator = new QTranslator(this);
+    translator->load("qt_zh_CN.qm", QApplication::applicationDirPath() + "/translations");
+    qApp->installTranslator(translator);
+
     setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
     setAttribute(Qt::WA_TranslucentBackground);
 
